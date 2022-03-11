@@ -25,8 +25,19 @@ def scrape_novidades(html_content):
 
 
 # Requisito 3
+# explicação de requests.exceptions.RequestException obtida em:
+# https://stackoverflow.com/questions/16511337/correct-way-to-try-except-using-python-requests-module
+# ela cobrirá exceções de ConnectionError, HTTPError e Timeout.
+# Se url_next_page não existe, então uma das exceções será atendida.
 def scrape_next_page_link(html_content):
-    """Seu código deve vir aqui"""
+    selector = Selector(text=html_content)
+    try:
+        url_next_page = selector.css(
+            ".tec--btn::attr(href)"
+        ).get()
+    except requests.exceptions.RequestException:
+        return None
+    return url_next_page
 
 
 # Requisito 4
