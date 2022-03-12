@@ -10,9 +10,8 @@ def fetch(url):
         time.sleep(1)
     except requests.ReadTimeout:
         return None
-    if response.status_code != 200:
-        return None
-    return response.text
+    if response.status_code == 200:
+        return response.text
 
 
 # Requisito 2
@@ -40,9 +39,79 @@ def scrape_next_page_link(html_content):
     return url_next_page
 
 
-# Requisito 4
+# Requisito 4 - feito com a ajuda de Erik Kreis
 def scrape_noticia(html_content):
-    """Seu código deve vir aqui"""
+    selector = Selector(text=html_content)
+
+    url = selector.css(
+        "link[rel=canonical]::attr(href)"
+    ).get()
+
+    title = selector.css(
+        "h1.tec--article__header__title::text"
+    ).get()
+
+    timestamp = selector.css(
+        "#js-article-date::attr(datetime)"
+    ).get()
+
+    writer = (
+        selector.css(
+            ".tec--author__info p *::text"
+        ).get()
+        or selector.css(
+            ".tec--timestamp__item a::text"
+        ).get()
+    )
+
+    if writer == '' or writer is None:
+        writer = None
+    if writer is not None:
+        writer = writer.strip()
+
+    shares_count = selector.css(
+        "div.tec--toolbar__item::text"
+    ).re_first(r"\d+")
+
+    comments_count = selector.css(
+        "#js-comments-btn::attr(data-count)"
+    ).get()
+
+    summary = selector.css(
+        ".tec--article__body p:first-child *::text"
+    ).getall()
+
+    sources = selector.css(
+        "div.z--mb-16 h2 ~ div a.tec--badge::text"
+    ).getall()
+
+    sources = [source.strip() for source in sources]
+
+    categories = selector.css(
+        "#js-categories a::text"
+    ).getall()
+
+    categories = [category.strip() for category in categories]
+
+    if shares_count == '' or shares_count is None:
+        shares_count = 0
+
+    if comments_count == '' or comments_count is None:
+        comments_count = 0
+
+    dictionary = {
+        'url': url,
+        'title': title,
+        'timestamp': timestamp,
+        'writer': writer,
+        'shares_count': int(shares_count),
+        'comments_count': int(comments_count),
+        'summary': "".join(summary),
+        'sources': sources,
+        'categories': categories,
+    }
+
+    return dictionary
 
 
 # Requisito 5
