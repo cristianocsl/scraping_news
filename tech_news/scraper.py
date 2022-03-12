@@ -1,6 +1,7 @@
 from parsel import Selector
 import requests
 import time
+from tech_news.database import create_news
 
 
 # Requisito 1
@@ -69,9 +70,14 @@ def scrape_noticia(html_content):
     if writer is not None:
         writer = writer.strip()
 
+    # shares_count = selector.css(
+    #     "div.tec--toolbar__item::text"
+    # ).re_first(r"\d+")
+
+    # outra alternativa para tratar shares_count
     shares_count = selector.css(
         "div.tec--toolbar__item::text"
-    ).re_first(r"\d+")
+    ).get()
 
     comments_count = selector.css(
         "#js-comments-btn::attr(data-count)"
@@ -96,6 +102,12 @@ def scrape_noticia(html_content):
     if shares_count == '' or shares_count is None:
         shares_count = 0
 
+    # outra alternativa para tratar shares_count
+    try:
+        shares_count = shares_count.split()[0]
+    except AttributeError:
+        print("Erro aconteceu")
+
     if comments_count == '' or comments_count is None:
         comments_count = 0
 
@@ -111,9 +123,12 @@ def scrape_noticia(html_content):
         'categories': categories,
     }
 
+    print(dictionary)
+
     return dictionary
 
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    created = create_news()
+    return created
