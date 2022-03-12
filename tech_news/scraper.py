@@ -40,6 +40,19 @@ def scrape_next_page_link(html_content):
     return url_next_page
 
 
+# solução 2 de shares_count
+def handle_with_shares_count(shares_count):
+    if shares_count == '' or shares_count is None:
+        return shares_count == 0
+
+    # outra alternativa para tratar shares_count
+    try:
+        new_shares_count = shares_count.split()[0]
+    except AttributeError:
+        print("Erro aconteceu")
+    return new_shares_count
+
+
 # Requisito 4 - feito com a ajuda de Erik Kreis
 def scrape_noticia(html_content):
     selector = Selector(text=html_content)
@@ -70,11 +83,12 @@ def scrape_noticia(html_content):
     if writer is not None:
         writer = writer.strip()
 
+    # solução 1 de shares_count
     # shares_count = selector.css(
     #     "div.tec--toolbar__item::text"
     # ).re_first(r"\d+")
 
-    # outra alternativa para tratar shares_count
+    # solução 2 de shares_count
     shares_count = selector.css(
         "div.tec--toolbar__item::text"
     ).get()
@@ -99,14 +113,8 @@ def scrape_noticia(html_content):
 
     categories = [category.strip() for category in categories]
 
-    if shares_count == '' or shares_count is None:
-        shares_count = 0
-
-    # outra alternativa para tratar shares_count
-    try:
-        shares_count = shares_count.split()[0]
-    except AttributeError:
-        print("Erro aconteceu")
+    # solução 2 de shares_count
+    shares_count = handle_with_shares_count(shares_count)
 
     if comments_count == '' or comments_count is None:
         comments_count = 0
@@ -122,8 +130,6 @@ def scrape_noticia(html_content):
         'sources': sources,
         'categories': categories,
     }
-
-    print(dictionary)
 
     return dictionary
 
