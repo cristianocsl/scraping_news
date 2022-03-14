@@ -119,23 +119,22 @@ def scrape_noticia(html_content):
 # Requisito 5
 def get_tech_news(amount):
     URL_BASE = "https://www.tecmundo.com.br/novidades"
-    title_urls_base = []
-    news_content_list = []
+    url_accumulator = []
 
-    while len(title_urls_base) < amount:
+    while len(url_accumulator) < amount:
         html_content = fetch(URL_BASE)
-        title_urls = scrape_novidades(html_content)
-        title_urls_base.extend(title_urls)
+        urls_list_from_titles = scrape_novidades(html_content)
+        url_accumulator.extend(urls_list_from_titles)
 
-        if len(title_urls_base) < amount:
+        if len(url_accumulator) < amount:
             URL_BASE = scrape_next_page_link(html_content)
 
-        if len(title_urls_base) > amount:
-            title_urls_base = title_urls_base[:amount]
+        if len(url_accumulator) > amount:
+            url_accumulator = url_accumulator[:amount]
 
     news_content_list = [
         scrape_noticia(fetch(url_novidade))
-        for url_novidade in title_urls_base
+        for url_novidade in url_accumulator
     ]
 
     create_news(news_content_list)
