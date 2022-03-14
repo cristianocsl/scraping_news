@@ -60,11 +60,7 @@ def scrape_noticia(html_content):
     writer = (
         selector.css(".tec--author__info p *::text").get()
         or selector.css(".tec--timestamp__item a::text").get()
-    )
-    if writer == "" or writer is None:
-        writer = None
-    if writer is not None:
-        writer = writer.strip()
+    ).strip()
 
     # solução 1 de shares_count
     # shares_count = selector.css(
